@@ -4,16 +4,9 @@ pacman::p_load(stringr, rgdal, rgeos, raster, maptools, zoo, igraph, leaflet)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-print(args[1])
-print("Succes")
-print(args[2])
-print("Succes2")
-print(args[3])
-print("Succes3")
 inputshp <- args[1]
 inputcsv <- args[2]
 layername <- args[3]
-
 
 # Load Shapefile
 shape <- readOGR(dsn= inputshp, layer = layername)
@@ -48,7 +41,7 @@ m <- merge(shape, rounddf, by.x = "label", by.y = "Oldindex")
 inputshpsplit <- unlist(strsplit(inputshp, '[.]'))
 writeOGR(m, paste(inputshpsplit,'_allvall.shp'), paste(inputshpsplit,'_allvall'), driver = 'ESRI Shapefile')
 
-print("Shapefile merged, terminating R script. Great succes!")
+print("Shapefile merged, terminating R script!")
 
 
 #---------------#
@@ -84,4 +77,3 @@ print("Shapefile merged, terminating R script. Great succes!")
 #conmatr <- confusionMatrix(data[,19],pred)
 
 #summary(model1)
-
