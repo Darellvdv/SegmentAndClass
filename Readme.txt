@@ -1,44 +1,60 @@
-Framework to segment and classify images
+Multithreaded framework to segment and classify images
 
-Start_chain.bat
+Start_chain_Multicore.bat
 ---------------
-dir = set dir of images to be processed
-scriptdir = set correct path to OBIA_chain.py
-batchdir = set correct path to LSMSSegmentation_chain.bat
+Rscript = path to Multicore.R
+indir = path to images folder
+outdir = path to output folder (will be created if non-existend)
+pythonscript = path to OBIA_chain.py
+batchdir = path to LSMSSegmentation_chain.bat
 
+
+Multicore.R
+------------
+-corenr: set the amount of cores
+
+At the system call Python line:
 -pre = yes, no. Start pre-processing (LSMMSsegmentation step) or skip to attributes calculation
 -att = rgb, rgbnir, rgbheight, rgbnirheight. Set if images have NIR band and if height is used. IF height is used:
 -dsm = path to dsm
 -dtm = path to dtm
 
+
 LSMSSegmentation_chain.bat
 --------------------------
 appfolder = set correct path to OTBdlls folder
 tilesize = set the tilesize
-spatialr = spatial range
-ranger = radius range
+
+
+Segmentation settings
+---------------------
+Processing time heavily depends on the settings and thus the amount of segments. Most of the proccessing time 
+is taken up by filtering (smoothing) and small segment merging (+80% of the time). Setting lower smoothing and
+segment merging thresholds improves processing time, but generates more (unwanted) segments.  
+
+General:
+-tilesize: Bigger tiles = faster, but influences results when there is shadow. A tilesize of 500 is best and will generate
+	   20 x 20 tiles for each image that is 10000 x 10000.
+
+-Ranger: best settings are around 2% of the spectral range of the input image. For a range of 0-255 this would mean
+	 a ranger setting around 5. Lower values means more segments.
+
+-Spatial: The connected component parameter is the spatial range in pixel values. For a dataset with a pixel size of
+	  4.5cm a range from 5 is best.
+
+-Maxiter: Times the meanshift smoothing can itterate over a region before it reaches its threshold. Higher levels means
+	  smoother results, but heavily increase proccesing time.
+
+-Thresh:  Threshold the meanshift smoothing can reach before it stops. Increasing this threshold heavily increases 
+	  processing time
+
+-Minsize: The minimum size for segments in pixel values. In the segmentation step, this minsize is quick and will remove
+	  all segments below the threshold. In the SmallRegionsMerging step, this paramater merges regions below the threshold
+	  to surrounding segments based on spectral characteristics. This parameter is the biggest infleunce of proccessing 
+	  time and can take up to 75% of the total processing time. Settings above 300 will take large amount of time.
+
 
 OBIA_chain.py
 -------------
-For classification rules, see line 636
-
-
-Good settings:
-
-On avarage processing takes about 2 hours per tile on 'The Beast'. 
-
-General:
--tilesize (bigger tiles = faster, but influences results when there is shadow (less is better))
-
-Meanshiftsmoothing: 
--spatialr 10 (below 10 = less smoothing, faster) (above 10 = more smoothing, slower)
--maxiter 10 (above 10 is more itterations = more smoothing, slower)
--modesearch 0 (do not change, otherwise tile merging not possible)
-
-Segmentation:
--ranger 7.5 (above 7.5 = less segments, sometimes misses parts) (below 7.5 = more segments, slower)
--spatialr (not sure yet)
--minsize 0 (otherwise segments are removed)
-
-SmallRegionsMerging:
--minsize 300 (above 300, slow but less segments) (below 300, fast but a lot of segments)
+For classification rules, see line 636 
+ 
